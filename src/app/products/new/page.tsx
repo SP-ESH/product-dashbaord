@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { LinkButton } from "@/components/ui/LinkButton";
+import { useToast } from "@/components/ui/Toast";
 import { createProduct } from "@/features/products/api";
 import { ProductForm } from "@/features/products/components/ProductForm";
 import { useMutations } from "@/features/products/MutationsProvider";
@@ -13,6 +14,7 @@ import { EMPTY_PRODUCT_FORM } from "@/features/products/validation";
 export default function NewProductPage() {
   const router = useRouter();
   const { state, recordCreate } = useMutations();
+  const { showToast } = useToast();
 
   async function handleSubmit(payload: ProductPayload) {
     const created = await createProduct(payload);
@@ -33,7 +35,10 @@ export default function NewProductPage() {
     );
     recordCreate(product);
 
-    router.replace(`/products/${product.id}?created=1`);
+    showToast(
+      `"${product.title}" was created. DummyJSON does not persist it, so it is kept for this session only.`,
+    );
+    router.replace(`/products/${product.id}`);
   }
 
   return (

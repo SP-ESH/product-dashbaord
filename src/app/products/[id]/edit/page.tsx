@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { FullPageSpinner } from "@/components/ui/FullPageSpinner";
 import { LinkButton } from "@/components/ui/LinkButton";
 import { EmptyState, ErrorState } from "@/components/ui/States";
+import { useToast } from "@/components/ui/Toast";
 import { updateProduct } from "@/features/products/api";
 import { ProductForm } from "@/features/products/components/ProductForm";
 import { useProduct } from "@/features/products/hooks/useProduct";
@@ -27,6 +28,7 @@ export default function EditProductPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { state, recordUpdate } = useMutations();
+  const { showToast } = useToast();
 
   const id = Number(params.id);
   const { product, isLoading, notFound, error, retry } = useProduct(id);
@@ -59,7 +61,11 @@ export default function EditProductPage() {
       : { ...current, ...(await updateProduct(current.id, payload)) };
 
     recordUpdate(updated);
-    router.replace(`/products/${updated.id}?updated=1`);
+
+    showToast(
+      `"${updated.title}" was updated. DummyJSON does not persist it, so the change is kept for this session only.`,
+    );
+    router.replace(`/products/${updated.id}`);
   }
 
   return (

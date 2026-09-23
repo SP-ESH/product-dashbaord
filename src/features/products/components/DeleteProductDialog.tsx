@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { useToast } from "@/components/ui/Toast";
 import { toApiError } from "@/lib/api/errors";
 
 import { deleteProduct } from "../api";
@@ -25,6 +26,7 @@ export function DeleteProductDialog({
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { state, recordDelete } = useMutations();
+  const { showToast } = useToast();
 
   async function handleDelete() {
     if (!product || isDeleting) return; // Guards against a double click.
@@ -42,6 +44,7 @@ export function DeleteProductDialog({
       }
 
       recordDelete(product);
+      showToast(`"${product.title}" was deleted.`);
       onDeleted?.(product);
       onClose();
     } catch (caught: unknown) {

@@ -37,8 +37,8 @@ pagination, search, filtering and sorting are implemented in this repo.
   server-side.
 - **Product details** — gallery, description, metadata and reviews.
 - **Create / edit / delete** — validated forms, a delete confirmation modal,
-  duplicate-submission protection, and a local overlay that keeps the result
-  visible for the session.
+  duplicate-submission protection, a bottom-right toast confirming what
+  happened, and a local overlay that keeps the result visible for the session.
 - **URL state** — `page`, `pageSize`, `search`, `category`, `sort` and `order`
   all live in the query string.
 - **Loading / empty / error states** for every async operation, with retry.
@@ -96,7 +96,7 @@ src/
   components/
     AppHeader.tsx
     ui/                         # Button, LinkButton, Field/Input/Select/Textarea,
-                                # Modal, Spinner, FullPageSpinner, States
+                                # Modal, Toast, Spinner, FullPageSpinner, States
 
   features/
     auth/
@@ -305,6 +305,11 @@ Known trade-offs, kept simple on purpose:
   *before* the not-found branch, so a network error is not mislabelled as a
   missing product.
 - **Cancellation** is never surfaced as an error.
+- **Success** — creating, updating and deleting show a toast in the bottom-right
+  corner, so the outcome is visible even though the page has navigated away.
+  Toasts are for completed actions only; validation and submission errors stay
+  inline next to the form or inside the confirmation modal, where the user can
+  act on them.
 
 ## Responsive behaviour
 
