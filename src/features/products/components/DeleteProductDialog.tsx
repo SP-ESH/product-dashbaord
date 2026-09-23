@@ -24,7 +24,7 @@ export function DeleteProductDialog({
 }: DeleteProductDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { recordDelete } = useMutations();
+  const { state, recordDelete } = useMutations();
 
   async function handleDelete() {
     if (!product || isDeleting) return; // Guards against a double click.
@@ -33,7 +33,14 @@ export function DeleteProductDialog({
     setError(null);
 
     try {
-      await deleteProduct(product.id);
+      // A product created in this session exists only in the local overlay, so
+      // DELETE would 404 on an id the server never stored. Dropping it from
+      // the overlay is the whole deletion in that case.
+      const isLocalOnly = state.created.some((item) => item.id === product.id);
+      if (!isLocalOnly) {
+        await deleteProduct(product.id);
+      }
+
       recordDelete(product);
       onDeleted?.(product);
       onClose();

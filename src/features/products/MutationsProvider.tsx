@@ -85,11 +85,22 @@ export function MutationsProvider({ children }: { children: ReactNode }) {
   }, [updateState]);
 
   const recordDelete = useCallback((product: Product) => {
-    updateState((current) => ({
-      ...current,
-      created: current.created.filter((item) => item.id !== product.id),
-      deleted: [...current.deleted, product],
-    }));
+    updateState((current) => {
+      // Deleting a locally created product just removes it from the overlay.
+      // It must not also land in `deleted`, or it would be subtracted from the
+      // server's total even though it was never part of it.
+      const wasLocallyCreated = current.created.some(
+        (item) => item.id === product.id,
+      );
+
+      return {
+        ...current,
+        created: current.created.filter((item) => item.id !== product.id),
+        deleted: wasLocallyCreated
+          ? current.deleted
+          : [...current.deleted, product],
+      };
+    });
   }, [updateState]);
 
   const value = useMemo(

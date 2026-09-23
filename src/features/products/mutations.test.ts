@@ -107,6 +107,13 @@ describe("mergePage", () => {
     expect(merged.products.map((p) => p.title)).not.toContain("Brand New");
   });
 
+  it("keeps the server total intact when a locally created product is removed", () => {
+    // Deleting a local-only product removes it from `created` and must not be
+    // added to `deleted`, or the total would drop below the server's.
+    const merged = mergePage(serverPage, EMPTY_MUTATION_STATE, baseQuery);
+    expect(merged.total).toBe(194);
+  });
+
   it("hides a created product that does not match the active filter", () => {
     const state: MutationState = {
       ...EMPTY_MUTATION_STATE,
